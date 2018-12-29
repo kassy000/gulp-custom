@@ -20,8 +20,9 @@ var init = function(){
 }
 
 function fileChanged(e){
+	console.log('fileChanged:e:' + e)
 	var type = e.event;
-	var src = e.history[0];
+	var src = e.path;
 
 
 	var fileExtension = files.getFileExtension(src);
@@ -37,7 +38,7 @@ function fileChanged(e){
 	}
 
 	for(var key in situation){
-		console.log(key + ' : ' + situation[key]);
+		console.log('key + \' : \' + situation[key]' + key + ' : ' + situation[key]);
 	}
 
 
@@ -54,7 +55,7 @@ function fileChanged(e){
 		php : 'php'
 	}
 
-	console.log(fileExtension)
+	console.log('fileExtension' + fileExtension)
 	if (fileExtension in fileType) {
 		console.log('ファイルタイプ' + fileExtension);
 		//console.log(fileType[fileExtension]);

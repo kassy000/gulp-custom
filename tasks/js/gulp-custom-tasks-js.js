@@ -74,10 +74,10 @@ var compileJs = function(){
 			var src = configJs.target[i].src;
 			var dist = configJs.target[i].dist;
 
-			console.log(src);
-			console.log(dist);
+			console.log('src:' + src);
+			console.log('dist:' + dist);
 
-			gulp.src(src)
+			return gulp.src(src)
 				.pipe(plugins.plumber({errorHandler: plugins.notify.onError('<%= error.message %>')}))
 				.pipe(include({
 					extensions: "js"
@@ -88,24 +88,30 @@ var compileJs = function(){
 			 	.pipe(through2.obj(function(file, encode, callback){
 					// fileにはsrcで読み込んだファイルの情報が引き渡される
 					// file.pathを利用してbrowserifyインスタンスを生成する
+
+
 					if(configJs.babel){
                         browserify(file.path, {})
-                            .transform(babelify, {presets: configJs.babelConfig}) //babelのコンパイル
+                            .transform(babelify, {plugins : configJs.babelPlugins ,presets: configJs.babelConfig}) //babelのコンパイル
                             .bundle(function(err, res){
+                            	/*
                                 // bundleを実行し，処理結果でcontentsを上書きする
                                 if(res && res != undefined){
-                                    file.contents = res;
+                                	file.contents = res;
                                     // callbackを実行し，次の処理にfileを引き渡す
                                     // nullになっている部分はエラー情報
                                     callback(null, file)
                                 }
+                                */
                             }).on('error', function (error) {
-                            console.log(red + error.message + reset);
-                            notifier.notify({
-                                title: 'JavaScript Compile Error',
-                                message: error.message
-                            });
-                        })
+                            	console.log('red + error.message + reset:' + red + error.message + reset);
+                            	notifier.notify({
+                                	title: 'JavaScript Compile Error',
+                                	message: error.message
+                            	});
+
+                        	})
+
 					}else{
                         browserify(file.path, {})
                             .bundle(function(err, res){
@@ -117,13 +123,14 @@ var compileJs = function(){
                                     callback(null, file)
                                 }
                             }).on('error', function (error) {
-                            console.log(red + error.message + reset);
+                            console.log('red + error.message + reset:' + red + error.message + reset);
                             notifier.notify({
                                 title: 'JavaScript Compile Error',
                                 message: error.message
                             });
                         })
 					}
+
 
 				}))
 				.pipe(gulp.dest(dist));

@@ -147,7 +147,10 @@ var init = function () {
 		addMin : false,
 		minify : false,
         babel : false,
-        babelConfig : ['es2015','stage-0'],
+		//babelConfig : ["react", ["es2015", { "modules": false }]],
+        //babelConfig : ['es2015','stage-0'],
+		babelConfig : ["@babel/preset-env"],
+		babelPlugins : ["@babel/plugin-proposal-class-properties"],
 	 	target : {
 			//{
 			//	src : './src/js/**/*.js',

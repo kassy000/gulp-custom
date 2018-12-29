@@ -30,7 +30,7 @@ var init = function(){
 var getFileName = function(path){
 	//return path.match(".+/(.+?)([\?#;].*)?$")[1];
 	var arr = path.match(".+/(.+?)\.[a-z]+([\?#;].*)?$");
-	console.log(arr)
+	console.log('getFileName:' + arr)
 	var fileName = arr[1];
 	return fileName;
 }
