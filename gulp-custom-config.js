@@ -36,6 +36,7 @@ var init = function () {
     }
 
 	module.exports.browserSync = {
+		browserSync:'true',
 		open: 'null',
         host: 'null',
 		proxy: null, //"http://server.dev:8888/",
@@ -145,6 +146,8 @@ var init = function () {
 	module.exports.js = {
 		addMin : false,
 		minify : false,
+        babel : false,
+        babelConfig : ['es2015','stage-0'],
 	 	target : {
 			//{
 			//	src : './src/js/**/*.js',

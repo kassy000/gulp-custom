@@ -29,21 +29,44 @@ var init = function(){
 //--------------------------------------------------------------
 // 監視するファイルと、実行したいタスク名を指定
 //--------------------------------------------------------------
-gulp.task('watch', function(){
+gulp.task('watch', done => {
+
 	if(Array.isArray(watchTarget)){
 		for (var i = 0; i < watchTarget.length; i ++) {
 			console.log('ウォッチターゲット:' + root + watchTarget[i]);
+
 			attachWatch(root + watchTarget[i]);
 		}
 	}else{
 		if(watchTarget){
+
 			attachWatch(root + watchTarget);
 		}
 	}
-})
+	done()
+});
 
 
 function attachWatch(target){
+
+
+	var watch = gulp.watch(target, function(e) {
+		var type = e.event;
+		var method;
+		console.log('ウォッチイベント:' + type);
+		console.log('ウォッチファイル:' + e.history);
+		for (var method in watchMethod){
+			eval(watchMethod[method])(e);
+		}
+
+	});
+
+
+	return watch;
+
+
+
+	/*
 	var watcher = watch(target, function(e){
 		var type = e.event;
 		var method;
@@ -52,7 +75,8 @@ function attachWatch(target){
 		for (var method in watchMethod){
 			eval(watchMethod[method])(e);
 		}
-	})
+	});
+	*/
 }
 
 custom.watch = module;

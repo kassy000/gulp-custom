@@ -37,7 +37,7 @@ var init = function(){
 //--------------------------------------------------------------
 //Themeのバックアップ
 //--------------------------------------------------------------
-gulp.task('backup-theme', function(){
+gulp.task('backup-theme', gulp.series(function(){
 	console.log('function:backup-theme')
 	if(Array.isArray(configWP.theme.name)){
 		for (var i = 0; i < configWP.theme.name.length; i ++) {
@@ -57,12 +57,12 @@ gulp.task('backup-theme', function(){
 			custom.backup.fileBackup(src, dist);
 		}
 	}
-})
+}));
 
 //--------------------------------------------------------------
 //Themeのデプロイ
 //--------------------------------------------------------------
-gulp.task('dist-theme', function(){
+gulp.task('dist-theme', gulp.series(function(){
 
 	if(Array.isArray(configWP.theme.name)){
 		for (var i = 0; i < configWP.theme.name.length; i ++) {
@@ -76,7 +76,7 @@ gulp.task('dist-theme', function(){
 		}
 	}
 
-})
+}));
 
 
 

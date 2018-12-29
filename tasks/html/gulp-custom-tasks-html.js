@@ -90,9 +90,9 @@ module.fullCompileJade = fullCompileJade;
 module.compileJade = compileJade;
 
 
-gulp.task('jade', function(){
+gulp.task('jade', gulp.series(function(){
 	fullCompileJade();
-});
+}));
 
 
 
@@ -128,9 +128,9 @@ module.fullCompilePug = fullCompilePug;
 module.compilePug = compilePug;
 
 
-gulp.task('pug', function(){
+gulp.task('pug', gulp.series(function(){
 	fullCompilePug();
-});
+}));
 
 init();
 

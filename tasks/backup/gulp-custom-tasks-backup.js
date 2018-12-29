@@ -38,7 +38,7 @@ var init = function(){
 //--------------------------------------------------------------
 //gulpfile.jsのバックアップ
 //--------------------------------------------------------------
-gulp.task('backupGulpfile', function(){
+gulp.task('backupGulpfile', gulp.series(function(){
 	var src = root + 'gulpfile.js';
 	var dist = root + config.backupGulpfile.dist + year + '-' + month + '-' + day + '/' + hour + '-' + minutes + '-' + second;
 	console.log('task:backupGulpfile')
@@ -46,12 +46,12 @@ gulp.task('backupGulpfile', function(){
 	console.log('ターゲット:' + dist);
 	gulp.src(src)
 		.pipe(gulp.dest(dist));
-})
+}));
 
 //--------------------------------------------------------------
 //ファイルのバックアップ
 //--------------------------------------------------------------
-gulp.task('backup', function(){
+gulp.task('backup', gulp.series(function(){
 	if(Array.isArray(localConfig)){
 		console.log('ファイルのバックアップ:' + localConfig.length);
 		for (var i = 0; i < localConfig.length; i ++) {
@@ -72,7 +72,7 @@ gulp.task('backup', function(){
 			console.log('ターゲット:' + dist);
 		}
 	}
-})
+}));
 
 var fileBackup = function(src,dist){
 	var filename = custom.files.getFilePath(src);

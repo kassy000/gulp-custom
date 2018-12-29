@@ -51,9 +51,9 @@ var ftpUpload = function(){
 
 }
 
-gulp.task('upload', function(){
+gulp.task('upload', gulp.series(function(){
 	ftpUpload();
-});
+}));
 
 global.ftpUpload = ftpUpload;
 module.ftpUpload = ftpUpload;

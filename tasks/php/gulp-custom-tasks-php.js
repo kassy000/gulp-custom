@@ -65,9 +65,9 @@ var compilePhp = function(){
 	*/
 }
 
-gulp.task('php', function(){
+gulp.task('php', gulp.series(function(){
 	//compilePhp();
-});
+}));
 
 module.compilePhp = compilePhp;
 module.compile = compile;

@@ -10,39 +10,38 @@ var browserSync = global.browserSync;
 //--------------------------------------------------------------
 //ブラウザ同期サーバ起動
 
-global.gulp.task('browser-sync', function() {
-	console.log('ブラウザ:' + config.browserSync.proxy)
+global.gulp.task('browser-sync', gulp.series(function(){
+	console.log('ブラウザ同期サーバ起動');
+	if(config.browserSync.browserSync){
+		console.log('ブラウザ:' + config.browserSync.proxy)
+		var initConf = {};
+		if(config.browserSync.proxy){
+			initConf['proxy'] = config.browserSync.proxy;
+			/*
+			if(config.browserSync.open){
+				initConf['open'] = config.browserSync.open;
+			}
+			if(config.browserSync.host){
+				initConf['host'] = config.browserSync.host;
+			}
+			if(config.browserSync.port){
+				initConf['port'] = config.browserSync.port;
+			}
+			*/
 
-	var initConf = {};
-	if(config.browserSync.proxy){
-		initConf['proxy'] = config.browserSync.proxy;
-		/*
-		if(config.browserSync.open){
-			initConf['open'] = config.browserSync.open;
-		}
-		if(config.browserSync.host){
-			initConf['host'] = config.browserSync.host;
-		}
-		if(config.browserSync.port){
-			initConf['port'] = config.browserSync.port;
-		}
-		*/
 
-
-	}else if(config.browserSync.baseDir){
-		initConf['server'] = {
-			baseDir : config.browserSync.baseDir
+		}else if(config.browserSync.baseDir){
+			initConf['server'] = {
+				baseDir : config.browserSync.baseDir
+			}
 		}
+		if(config.browserSync.https){
+			initConf['https'] = config.browserSync.https;
+		}
+
+	   browserSync.init(initConf);
 	}
-	if(config.browserSync.https){
-		initConf['https'] = config.browserSync.https;
-	}
-
-	browserSync.init(initConf);
-
-
-
-});
+}));
 
 // ブラウザリロード
 var browserReload = function(){

@@ -57,9 +57,9 @@ var fullCompile = function(extension){
 //--------------------------------------------------------------
 //SASS
 //--------------------------------------------------------------
-gulp.task('sass', function(){
+gulp.task('sass', gulp.series(function(){
 	fullCompileSass();
-});
+}));
 
 var fullCompileSass = function(){
 	if('sass' in localConf){
@@ -116,9 +116,9 @@ var sassChanged = function(src){
 //--------------------------------------------------------------
 //Compass
 //--------------------------------------------------------------
-gulp.task('compass', function(){
+gulp.task('compass', gulp.series(function(){
 	fullCompile('compass');
-});
+}));
 
 
 var compileCompass = function(src,dest){

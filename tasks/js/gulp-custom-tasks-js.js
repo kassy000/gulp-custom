@@ -2,7 +2,9 @@
 var gulp,custom,config,plugins;
 gulp = global.gulp;
 custom = global.custom;
+plugins = global.plugins;
 config = custom.config;
+
 
 var configJs,configTs;
 
@@ -15,6 +17,7 @@ var through2 = require('through2');
 var include = require('gulp-include');
 
 var notifier = require('node-notifier');
+var babelify = require('babelify');
 
 var black   = '\u001b[30m';
 var red     = '\u001b[31m';
@@ -41,7 +44,7 @@ var init = function(){
 	}
 
 
-	console.log('TypeScript初期化');
+	//console.log('TypeScript初期化');
 	configTs = custom.config.ts;
 	if(configTs.target.length > 0){
 		config.default.tasks.push('ts');
@@ -76,62 +79,52 @@ var compileJs = function(){
 
 			gulp.src(src)
 				.pipe(plugins.plumber({errorHandler: plugins.notify.onError('<%= error.message %>')}))
-
-				/*
-				.pipe(plugins.fileInclude({
-					prefix: '@@',
-					basepath: '@file'
-				}))
-				*/
 				.pipe(include({
 					extensions: "js"
 				}))
 				.pipe(plugins.beautify({indentSize: 1}))
 				.pipe(gulpif(configJs.addMin, plugins.rename({extname: '.min.js'})))
 				.pipe(gulpif(configJs.minifiy, plugins.uglify()))
-
-				//.pipe(browserify(src,{}))
-				//.bundle()
 			 	.pipe(through2.obj(function(file, encode, callback){
 					// fileにはsrcで読み込んだファイルの情報が引き渡される
 					// file.pathを利用してbrowserifyインスタンスを生成する
-					browserify(file.path, {})
-						.bundle(function(err, res){
-							// bundleを実行し，処理結果でcontentsを上書きする
-							if(res && res != undefined){
-								file.contents = res;
-								// callbackを実行し，次の処理にfileを引き渡す
-								// nullになっている部分はエラー情報
-								callback(null, file)
-							}
-						}).on('error', function (error) {
-							/*
-							console.error(error.toString())
-							this.emit('end')
-							*/
-							console.log(red + error.message + reset);
+					if(configJs.babel){
+                        browserify(file.path, {})
+                            .transform(babelify, {presets: configJs.babelConfig}) //babelのコンパイル
+                            .bundle(function(err, res){
+                                // bundleを実行し，処理結果でcontentsを上書きする
+                                if(res && res != undefined){
+                                    file.contents = res;
+                                    // callbackを実行し，次の処理にfileを引き渡す
+                                    // nullになっている部分はエラー情報
+                                    callback(null, file)
+                                }
+                            }).on('error', function (error) {
+                            console.log(red + error.message + reset);
+                            notifier.notify({
+                                title: 'JavaScript Compile Error',
+                                message: error.message
+                            });
+                        })
+					}else{
+                        browserify(file.path, {})
+                            .bundle(function(err, res){
+                                // bundleを実行し，処理結果でcontentsを上書きする
+                                if(res && res != undefined){
+                                    file.contents = res;
+                                    // callbackを実行し，次の処理にfileを引き渡す
+                                    // nullになっている部分はエラー情報
+                                    callback(null, file)
+                                }
+                            }).on('error', function (error) {
+                            console.log(red + error.message + reset);
+                            notifier.notify({
+                                title: 'JavaScript Compile Error',
+                                message: error.message
+                            });
+                        })
+					}
 
-							notifier.notify({
-								title: 'JavaScript Compile Error',
-								message: error.message
-							});
-						})
-					
-					
-				
-					/*
-					browserify(file.path)
-					  .bundle()
-					  .on('error', function(err){
-						console.log(red + err.message + reset);
-						
-						notifier.notify({
-						  'title': 'JavaScript Compile Error',
-						  'message': err.message
-						});
-					  })
-					  */
-					
 				}))
 				.pipe(gulp.dest(dist));
 
@@ -139,9 +132,14 @@ var compileJs = function(){
 	}
 }
 
-gulp.task('js', function(){
+gulp.task('js', gulp.series(function(){
 	compileJs();
-});
+}));
+
+
+//--------------------------------------------------------------
+//Babelのコンパイル
+//--------------------------------------------------------------
 
 
 //--------------------------------------------------------------
@@ -206,9 +204,9 @@ var compileTs = function(){
 	}
 }
 
-gulp.task('ts', function(){
+gulp.task('ts', gulp.series(function(){
 	compileTs();
-});
+}));
 
 
 
