@@ -31,17 +31,40 @@ var init = function(){
 //--------------------------------------------------------------
 gulp.task('watch', function(done) {
 
-	var event = "dfsddfg";
-	if(Array.isArray(watchTarget)){
-		for (var i = 0; i < watchTarget.length; i ++) {
-			console.log('ウォッチターゲット:' + root + watchTarget[i]);
-			attachWatch(root + watchTarget[i]);
+	if(localConfig.watch.length > 0){
+		for (var i = 0; i < localConfig.watch.length; i ++) {
+			var target = localConfig.watch[i]['target']
+			var task = localConfig.watch[i]['task']
+			console.log(target)
+			console.log(task)
+			//console.log(localConfig.watch[i])
+			//console.log(localConfig.watch[i]['target'])
+			//console.log(localConfig.watch[i]['task'])
+			gulp.watch(target, gulp.series(task));
+
 		}
+
 	}else{
-		if(watchTarget){
-			attachWatch(root + watchTarget);
+		if(Array.isArray(watchTarget)){
+			for (var i = 0; i < watchTarget.length; i ++) {
+				console.log('ウォッチターゲット:' + root + watchTarget[i]);
+				attachWatch(root + watchTarget[i]);
+			}
+		}else{
+			if(watchTarget){
+				attachWatch(root + watchTarget);
+			}
 		}
+
+		/*
+		if(localConfig.task.length > 0){
+			gulp.watch('./public_html/src/js/**.js', gulp.task(localConfig.task));
+		}
+		*/
 	}
+
+
+
 	done();
 });
 

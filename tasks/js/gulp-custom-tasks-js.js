@@ -18,6 +18,10 @@ var include = require('gulp-include');
 
 var notifier = require('node-notifier');
 var babelify = require('babelify');
+const webpackStream = require("webpack-stream");
+const webpack = require("webpack");
+
+const webpackConfig = config.js.webpackConfig;
 
 var black   = '\u001b[30m';
 var red     = '\u001b[31m';
@@ -41,6 +45,7 @@ var init = function(){
 	configJs = custom.config.js;
 	if(configJs.target.length > 0){
 		config.default.tasks.push('js');
+		console.log('追加')
 	}
 
 
@@ -53,6 +58,8 @@ var init = function(){
 
 var compile = function(ext){
 
+	//console.log('コンパイル')
+
 	if(ext == 'ts'){
 		compileTs();
 	}else if(ext == 'js'){
@@ -64,18 +71,48 @@ var compile = function(ext){
 
 
 
+
+//gulp webpackで実行
+
+/*
+gulp.task('webpack', function() {
+	console.log('ウェブパック2')
+
+
+	return webpackStream(webpackConfig, webpack)
+		.pipe(gulp.dest('./'));
+
+});
+*/
+
+
+// タスクの定義。 ()=> の部分はfunction() でも可
+
+
+
+
+gulp.task("webpack", () => {
+	console.log('webpack');
+	// ☆ webpackStreamの第2引数にwebpackを渡す☆
+	return webpackStream(webpackConfig, webpack)
+		.pipe(gulp.dest(config.js.webpackDist));
+});
+
+
+
+
+
+
+
+
 //--------------------------------------------------------------
 //JSのコンパイル
 //--------------------------------------------------------------
 var compileJs = function(){
 	if(configJs && configJs.target.length > 0){
-		console.log('compileJs');
 		for(var i=0; i < configJs.target.length; i++){
 			var src = configJs.target[i].src;
 			var dist = configJs.target[i].dist;
-
-			console.log('src:' + src);
-			console.log('dist:' + dist);
 
 			return gulp.src(src)
 				.pipe(plugins.plumber({errorHandler: plugins.notify.onError('<%= error.message %>')}))
@@ -85,63 +122,94 @@ var compileJs = function(){
 				.pipe(plugins.beautify({indentSize: 1}))
 				.pipe(gulpif(configJs.addMin, plugins.rename({extname: '.min.js'})))
 				.pipe(gulpif(configJs.minifiy, plugins.uglify()))
-			 	.pipe(through2.obj(function(file, encode, callback){
+				.pipe(through2.obj(function(file, encode, callback){
 					// fileにはsrcで読み込んだファイルの情報が引き渡される
 					// file.pathを利用してbrowserifyインスタンスを生成する
 
 
 					if(configJs.babel){
-                        browserify(file.path, {})
-                            .transform(babelify, {plugins : configJs.babelPlugins ,presets: configJs.babelConfig}) //babelのコンパイル
-                            .bundle(function(err, res){
-                            	/*
-                                // bundleを実行し，処理結果でcontentsを上書きする
-                                if(res && res != undefined){
-                                	file.contents = res;
-                                    // callbackを実行し，次の処理にfileを引き渡す
-                                    // nullになっている部分はエラー情報
-                                    callback(null, file)
-                                }
-                                */
-                            }).on('error', function (error) {
-                            	console.log('red + error.message + reset:' + red + error.message + reset);
-                            	notifier.notify({
-                                	title: 'JavaScript Compile Error',
-                                	message: error.message
-                            	});
+						browserify(file.path, {})
+							.transform(babelify, {plugins : configJs.babelPlugins ,presets: configJs.babelConfig}) //babelのコンパイル
+							.bundle(function(err, res){
 
-                        	})
+								// bundleを実行し，処理結果でcontentsを上書きする
+								//if(res && res != undefined){
+								file.contents = res;
+								// callbackを実行し，次の処理にfileを引き渡す
+								// nullになっている部分はエラー情報
+								// callback(null, file)
+								//}
+								//
+							}).on('error', function (error) {
+							console.log('red + error.message + reset:' + red + error.message + reset);
+							notifier.notify({
+								title: 'JavaScript Compile Error',
+								message: error.message
+							});
+
+						})
 
 					}else{
-                        browserify(file.path, {})
-                            .bundle(function(err, res){
-                                // bundleを実行し，処理結果でcontentsを上書きする
-                                if(res && res != undefined){
-                                    file.contents = res;
-                                    // callbackを実行し，次の処理にfileを引き渡す
-                                    // nullになっている部分はエラー情報
-                                    callback(null, file)
-                                }
-                            }).on('error', function (error) {
-                            console.log('red + error.message + reset:' + red + error.message + reset);
-                            notifier.notify({
-                                title: 'JavaScript Compile Error',
-                                message: error.message
-                            });
-                        })
+						browserify(file.path, {})
+							.bundle(function(err, res){
+								// bundleを実行し，処理結果でcontentsを上書きする
+								if(res && res != undefined){
+									file.contents = res;
+									// callbackを実行し，次の処理にfileを引き渡す
+									// nullになっている部分はエラー情報
+									callback(null, file)
+								}
+							}).on('error', function (error) {
+							console.log('red + error.message + reset:' + red + error.message + reset);
+							notifier.notify({
+								title: 'JavaScript Compile Error',
+								message: error.message
+							});
+						})
 					}
 
 
 				}))
 				.pipe(gulp.dest(dist));
-
 		}
 	}
 }
 
-gulp.task('js', gulp.series(function(){
-	compileJs();
-}));
+
+
+
+
+
+
+
+gulp.task('js', done => {
+
+    
+    console.log(webpackConfig)
+    console.log(config.js.webpack)
+    console.log(config.js.babel)
+	if(webpackConfig && config.js.webpack && config.js.babel){
+		console.log('webpack');
+		// ☆ webpackStreamの第2引数にwebpackを渡す☆
+
+		return webpackStream(webpackConfig, webpack).on('error', function (e) {
+			this.emit('end');
+		})
+			.pipe(gulp.dest(webpackConfig.output.publicPath));
+        
+    
+
+		/*
+		return webpackStream(webpackConfig, webpack)
+			.pipe(gulp.dest(config.js.webpackDist));
+		*/
+	}else{
+		compileJs();
+	}
+
+	done();
+});
+
 
 
 //--------------------------------------------------------------

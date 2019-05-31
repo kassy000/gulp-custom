@@ -15,7 +15,7 @@ var localConf,configSass,outputStyle,sourcemaps,sourcemapsPath,sourceRoot,plefix
 var init = function(){
 	localConf = config.css
 	if(config.css['sass']){
-		config.default.tasks.push('sass');
+		//config.default.tasks.push('sass');
 	}
 	outputStyle =  config.css['outputStyle'];
 	sourcemaps =  config.css['sourcemaps'];
@@ -57,9 +57,10 @@ var fullCompile = function(extension){
 //--------------------------------------------------------------
 //SASS
 //--------------------------------------------------------------
-gulp.task('sass', gulp.series(function(){
+global.gulp.task('sass', done => {
 	fullCompileSass();
-}));
+	done();
+});
 
 var fullCompileSass = function(){
 	if('sass' in localConf){
@@ -73,25 +74,25 @@ var fullCompileSass = function(){
 			}
 		}
 	}
+
 }
 
 var compileSass = function(src,dist){
 
-	gulp.src(src)
+	return gulp.src(src)
 		.pipe(plugins.plumber({errorHandler: plugins.notify.onError('<%= error.message %>')}))
-		//.pipe(plugins.if(sourcemaps, plugins.sourcemaps.init({loadMaps: true})))
 		.pipe(plugins.if(sourcemaps, plugins.sourcemaps.init()))
-		//.pipe(plugins.sass({outputStyle:outputStyle,sourcemaps:sourcemaps}))
 		.pipe(plugins.sass({outputStyle:outputStyle}))
 		.pipe(plugins.if(plefix, plugins.autoprefixer(plefix)))
+        /*
+        .pipe(plugins.if(plefix, 
+            plugins.postcss([
+                plugins.postcssGapProperties(),
+                plugins.autoprefixer(plefix)
+            ])
+        ))
+        */
 		.pipe(plugins.if(sourcemaps, plugins.sourcemaps.write(sourcemapsPath,{includeContent: false, sourceRoot:sourceRoot})))
-		//.pipe(plugins.if(sourcemaps, plugins.sourcemaps.write('./')))
-
-		//.pipe(plugins.if(sourcemaps, plugins.sourcemaps.write('maps', {
-		//	includeContent: false,
- 		//	sourceRoot: 'public/resources/maps'
-  		//})))
-		//.pipe(plugins.cssnext())
 		.pipe(gulp.dest(dist));
 		console.log('compileSass:src:' + src)
 		console.log('compileSass:dest:' + dist)

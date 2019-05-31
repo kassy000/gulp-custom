@@ -11,14 +11,17 @@ var init = function () {
 
 	module.exports.default = {
 		tasks: [
-			//'uglify',
 			//'sass',
+			'watch',
+			//'uglify',
 			//'js',
 			//'jade',
-			'watch',
 			'browser-sync'
 		]
 	};
+
+
+
 
     module.exports.site = {
         local: {
@@ -52,8 +55,11 @@ var init = function () {
 		target: ['./folder'],
 		//method : ['changed','browserReload']
 		//method : ['fileChanged','browserReload']
-		method: ['fileChanged']
+		method: ['fileChanged'],
 	}
+
+	module.exports.watch.watch = [];
+
 
 	module.exports.files = {
 		copy: {
@@ -97,8 +103,10 @@ var init = function () {
 		sourcemapsPath: 'maps/',
 		sourceRoot: 'src/scss',
 		plefix: {
-            browsers: ['last 2 version', 'iOS >= 8.1', 'Android >= 4.4'],
-            cascade: false
+            browsers: ['last 2 version', 'ie >= 9', 'iOS >= 8.1', 'Android >= 4.4'],
+            cascade: false,
+            grid: true
+            
         },
 		sass: [
 			/*
@@ -147,6 +155,7 @@ var init = function () {
 		addMin : false,
 		minify : false,
         babel : false,
+        webpack : false,
 		//babelConfig : ["react", ["es2015", { "modules": false }]],
         //babelConfig : ['es2015','stage-0'],
 		babelConfig : ["@babel/preset-env"],
@@ -156,7 +165,9 @@ var init = function () {
 			//	src : './src/js/**/*.js',
 			//	dest : './js/'
 			//}
-		}
+		},
+        webpackConfig : null,
+		webpackDist : 'dist'
 	}
 
 	module.exports.ts = {

@@ -59,6 +59,7 @@ function fileChanged(e){
 	if (fileExtension in fileType) {
 		console.log('ファイルタイプ' + fileExtension);
 		//console.log(fileType[fileExtension]);
+        console.log(fileType[fileExtension])
 		custom[fileType[fileExtension]].compile(fileExtension);
 	}
 

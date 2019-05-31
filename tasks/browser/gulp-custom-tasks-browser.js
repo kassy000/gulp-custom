@@ -43,8 +43,15 @@ global.gulp.task('browser-sync', gulp.series(function(){
 	}
 }));
 
+global.gulp.task('reload', done => {
+	browserSync.reload();
+	done();
+	//done();
+});
+
+
 // ブラウザリロード
 var browserReload = function(){
-	global.browserSync.reload({stream: false});
+	browserSync.reload({stream: false});
 }
 global.browserReload = browserReload;
