@@ -20,8 +20,11 @@ var notifier = require('node-notifier');
 var babelify = require('babelify');
 const webpackStream = require("webpack-stream");
 const webpack = require("webpack");
+const beautify = require('gulp-beautify');
+const plumber = require('gulp-plumber');
+const notify = require('gulp-notify');
 
-const webpackConfig = config.js.webpackConfig;
+
 
 var black   = '\u001b[30m';
 var red     = '\u001b[31m';
@@ -33,6 +36,10 @@ var cyan    = '\u001b[36m';
 var white   = '\u001b[37m';
 
 var reset   = '\u001b[0m';
+
+
+var webpackConfig;
+
 
 
 
@@ -54,6 +61,9 @@ var init = function(){
 	if(configTs.target.length > 0){
 		config.default.tasks.push('ts');
 	}
+
+	webpackConfig = configJs.webpackConfig;
+
 }
 
 var compile = function(ext){
@@ -119,7 +129,7 @@ var compileJs = function(){
 				.pipe(include({
 					extensions: "js"
 				}))
-				.pipe(plugins.beautify({indentSize: 1}))
+				.pipe(beautify({indentSize: 1}))
 				.pipe(gulpif(configJs.addMin, plugins.rename({extname: '.min.js'})))
 				.pipe(gulpif(configJs.minifiy, plugins.uglify()))
 				.pipe(through2.obj(function(file, encode, callback){
@@ -192,10 +202,31 @@ gulp.task('js', done => {
 		console.log('webpack');
 		// ☆ webpackStreamの第2引数にwebpackを渡す☆
 
+        
+        
+    
+        
+        /*
 		return webpackStream(webpackConfig, webpack).on('error', function (e) {
 			this.emit('end');
 		})
 			.pipe(gulp.dest(webpackConfig.output.publicPath));
+        */
+        
+        return webpackStream(webpackConfig, webpack).on('error', function (e) {
+			this.emit('end');
+		})
+			.pipe(gulp.dest(config.js.webpackDist));
+          
+        
+        
+        /*
+        console.log(config.js.webpackTarget);
+        gulp.src(config.js.webpackTarget)
+            .pipe(webpackStream(webpackConfig, webpack))
+            //.pipe(gulp.dest(webpackConfig.output.publicPath));
+            .pipe(gulp.dest(config.js.webpackDist));
+        */
         
     
 
@@ -230,34 +261,25 @@ var compileTs = function(){
 	};
 	var target = configTs.target;
 	var options = configTs.options;
+
+	var tsProject = plugins.typescript.createProject('tsconfig.json', function() {
+		typescript: require('typescript')
+	});
+
+
 	if(target.length > 0){
 		for(var i=0; i < target.length; i++){
 			var src = target[i].src;
 			var dist = target[i].dist;
-			//console.log('ソース:' + src);
-			//console.log('Dist:' + dist);
-
-			/*
-			browserify({entries: [src]})
-				.bundle()
-				.pipe(plugins.plumber({errorHandler: plugins.notify.onError('<%= error.message %>')}))
-				.pipe(plugins.beautify({indentSize: 1}))
-				.pipe(plugins.typescript(options))
-    			.pipe(plugins.babel())
-				.pipe(gulpif(configTs.addMin, plugins.rename({extname: '.min.js'})))
-				.pipe(gulpif(configTs.minifiy, plugins.uglify()))
-				.pipe(gulp.dest(dist));
-			*/
-
 
 			gulp.src(src)
-				.pipe(plugins.plumber({errorHandler: plugins.notify.onError('<%= error.message %>')}))
+				.pipe(plumber({errorHandler: notify.onError('<%= error.message %>')}))
 				.pipe(plugins.fileInclude({
 					prefix: '@@',
 					basepath: '@file'
 				}))
-				.pipe(plugins.beautify({indentSize: 1}))
-				.pipe(plugins.typescript(options))
+				.pipe(beautify({indentSize: 1}))
+				.pipe(plugins.typescript(tsProject))
     			.pipe(plugins.babel())
 				.pipe(gulpif(configTs.addMin, plugins.rename({extname: '.min.js'})))
 				.pipe(gulpif(configTs.minifiy, plugins.uglify()))

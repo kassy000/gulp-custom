@@ -167,6 +167,7 @@ var init = function () {
 			//}
 		},
         webpackConfig : null,
+        webpackTarget : 'target',
 		webpackDist : 'dist'
 	}
 

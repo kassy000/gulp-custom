@@ -61,8 +61,8 @@ var fullCompileJade = function(){
 
 		if(conf.length > 0){
 			for(var i=0; i < conf.length; i++){
-				var src = root + '/' + conf[i].src;
-				var dist = root + '/' + conf[i].dist;
+				var src = root  + conf[i].src;
+				var dist = root  + conf[i].dist;
 				var ext = conf[i].ext;
 				compileJade(src,dist,ext);
 			}
@@ -105,8 +105,8 @@ var fullCompilePug = function(){
 		var conf = localConf.pug
 		if(conf.length > 0){
 			for(var i=0; i < conf.length; i++){
-				var src = root + '/' + conf[i].src;
-				var dist = root + '/' + conf[i].dist;
+				var src = root + conf[i].src;
+				var dist = root + conf[i].dist;
 				compilePug(src,dist);
 			}
 		}
