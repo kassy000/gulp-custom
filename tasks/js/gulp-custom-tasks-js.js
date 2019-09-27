@@ -193,8 +193,6 @@ var compileJs = function(){
 
 
 gulp.task('js', done => {
-
-    
     console.log(webpackConfig)
     console.log(config.js.webpack)
     console.log(config.js.babel)
@@ -202,10 +200,6 @@ gulp.task('js', done => {
 		console.log('webpack');
 		// ☆ webpackStreamの第2引数にwebpackを渡す☆
 
-        
-        
-    
-        
         /*
 		return webpackStream(webpackConfig, webpack).on('error', function (e) {
 			this.emit('end');

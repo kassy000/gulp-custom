@@ -53,8 +53,6 @@ module.compile = compile;
 
 //Jade
 //--------------------------------------------------------------
-
-
 var fullCompileJade = function(){
 	if('jade' in localConf){
 		var conf = config.html.jade
@@ -130,6 +128,7 @@ module.compilePug = compilePug;
 
 gulp.task('pug', gulp.series(function(){
 	fullCompilePug();
+	done();
 }));
 
 init();
